@@ -1,6 +1,6 @@
 # INC Game Framework
 
-A game development tool on Roblox.
+A game development tool on Roblox, written in luau.
 
 INC Game Framework is a tool that simplifies the process of game development on Roblox by significantly reducing and abstracting boilerplate code. It enforces a more functional approach to game development.
 
