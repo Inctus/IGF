@@ -12,22 +12,6 @@ local Forest = require(script.Forest)
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
-local SHARED_KEYWORDS = {
-	Shared = true;
-	S = true;
-}
-local GLOBAL_KEYWORDS = {
-	Global = true;
-	G = true;
-}
-local REQUIRE_KEYWORDS = {
-	["require"] = true;
-	r = true;
-	R = true;
-	Require = true;
-}
-
-
 function ModuleManager.new(inject: t.Injection): ModuleManager
 	local self = setmetatable({}, ModuleManager)
 	
@@ -58,8 +42,6 @@ function ModuleManager:GetModule(from: ModuleScript, path: t.Array<string>, isSh
 end
 
 function ModuleManager:CallModule(from: ModuleScript, path: t.Array<string>, args: t.Array<any>)
-	assert(REQUIRE_KEYWORDS[path[#path]], [[Attempt to directly manipulate the module hierarchy.
-		If you want to manipulate a module, use path.to.module.require() to get the contents.]])
 	--[[
 	a) 	if the module passed isn't an instance then perform a lookup in the aggregated hashmap
 		using the string name passed
