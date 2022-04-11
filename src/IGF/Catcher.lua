@@ -12,17 +12,16 @@ function appendTo(t, v)
 	return table.move(t, 1, #t, 1, _t)
 end
 
-function catcher(called, set, got, path)
+function catcher(called, set, path)
 	return setmetatable({}, {
 		__call = function(_, ...) return called(path, {...}) end; 
-		__index = function(_, i) return catcher(called, set, got, appendTo(path, i)) end; 
-		__unm = function(_) return got(path) end;
+		__index = function(_, i) return catcher(called, set, appendTo(path, i)) end; 
 		__newindex = function(_, i, v) set(appendTo(path, i), v) end; 
 	}) 
 end
 
-function new(called, set, got)
-	return catcher(called, set, got, {})
+function new(called, set)
+	return catcher(called, set, {})
 end
 
 return {new=new}
