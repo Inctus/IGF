@@ -1,0 +1,13 @@
+{
+  
+  "name": "IGF",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "IGF": {
+        "$path": "src/IGF"
+      }
+    }
+  }
+
+}
