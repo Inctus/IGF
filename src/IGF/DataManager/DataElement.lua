@@ -5,6 +5,8 @@
 	   	 	
 		Full notice in IGF.lua		]]--
 
-local module = {}
+local DataElement = {}
 
-return module
+export type DataElement = typeof(DataElement)
+
+return DataElement
