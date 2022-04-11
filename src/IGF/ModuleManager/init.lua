@@ -15,9 +15,8 @@ ModuleManager.__index = ModuleManager
 function ModuleManager.new(inject: t.Injection): ModuleManager
 	local self = setmetatable({}, ModuleManager)
 	
-	self.SharedForest = Forest.new(inject) :: Forest
 	self.MainForest = Forest.new(inject) :: Forest
-	self.Inject = inject :: t.Injection
+	self.SharedForest = Forest.new(inject, self.MainForest) :: Forest
 	
 	return self
 end
@@ -68,18 +67,15 @@ end
 
 function ModuleManager:GetCatcherHandlers(from: ModuleScript)
 	local function call(path, args)
-		assert(#path > 0, "Attempt to call with an empty path.")
-		return self:CallModule(from, path[1] == "Shared", path, args)
+		
 	end
 	
 	local function set(path, value)
-		assert(#path > 0, "Attempt to set with an empty path.")
-		return self:SetModule(from, path, value)
+		
 	end
 	
 	local function get(path)
-		assert(#path > 0, "Attempt to retrieve module from an empty path.")
-		return self:GetModule(from, path)
+		
 	end
 	
 	return call, set, get
