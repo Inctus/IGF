@@ -18,28 +18,22 @@ function func2(old, new, self)
 end
 
 function Example:init()
-	self.IGF:AddModule()
-			:AddSharedModule()
-			:InitialiseServerData()
-			:InitialiseLocalData()
-			:InitialiseSharedData()
-			:InitialiseClientSpecificData()
-		.Data.Path.subscribe()
-				  .get()
-				  .set()
-				  .rawSet()
-		.Clients.[ClientName/All/Some(predicate)/Random].Data.Path.subscribe()
-																  .get()
-																  .set()
-																  .rawSet()
-													   	.Path.function()
-		.Modules.Path()
-		.Modules.Path.function()
-	-- All of these return promises except GET (value) and SUBSCRIBE (subscription)
+	self.[variant].Data.Path.subscribe()
+				 		  	.get()
+				 		  	.set()
+				 		  	.rawSet()
+					   .initialisePublic() -- from SERVER -> SharedData from CLIENT -> SPECIFIC data
+					   .initialisePrivate() -- from SERVER -> Server Private from CLIENT -> Client Private
+			   	  .Modules.Path()
+			   	  .Modules.Path.function()
+			   	  .Modules.add()
+			   	  .Modules.Shared.Path()
+						         .Path.function()
+						         .add()
 	self.subscription = self.Data.Path.subscribe{func1, func2}
 	self.subscription:unSubscribe()
 					 :reSubscribe()
-					 :addBind()
+					 :bind()
 end
 
 function Example:main()
@@ -47,54 +41,4 @@ function Example:main()
 	wait(10)
 	self.subscription:reSubscribe()
 end
-
---[[REPLICATEDFIRST LOCAL SCRIPT]]
-
-require(game.IGF):AddModule(script.loadingModule)
-
---[[LOADING MODULE]]
-
-local Loading = {}
-
-function Loading:init()
-	--[[PERFORM LOADING ASYNCHRONOUSLY]]
-	self.IGF:AddModule(game.ReplicatedStorage.GameMain)
-end
-
-return Loading
-
---[[GAME MAIN]]
-
-local GameMain = {}
-
-function GameMain:init()
-	self.IGF.InputHandler:require()
-end
-
-return GameMain
-
---[[InputHandler]]
-
-local InputHandler = {}
-
-function InputHandler:init()
-	game.UserInputService:Connect(function()
-		self.Data.Input:set(true)
-	end)
-end
-
---[[InputReactor]]
-
-local InputReactor = {}
-
-function inputDetected(_, new)
-	if new == true then
-		print("Input detected")
-		self.Data.Input:rawSet(false)
-	end
-end
-
-function InputReactor:init()
-	self.Data.Input.subscribe(inputDetected)
-end 
 ```
