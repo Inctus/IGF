@@ -17,4 +17,6 @@ export type Function<A,B> = (A) -> (B)
 export type Closure = (...any?) -> (...any?)
 export type Injection = (Instance, any?) -> ()
 
+export type DataContext = "ServerPrivate" | "ServerPublic" | "ClientPrivate" | "ClientPublic"
+
 return {}
