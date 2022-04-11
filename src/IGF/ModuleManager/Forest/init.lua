@@ -13,12 +13,14 @@ local Node = require(script.Tree.Node)
 local Forest = {}
 Forest.__index = Forest
 
-function Forest.new(inject: t.Injection): Forest
+function Forest.new(inject: t.Injection, globalForest: Forest?): Forest
 	local self = setmetatable({}, Forest)
 
 	self.Trees = {} :: t.Dict<Tree>
 	self.AggregatedHashMap = {} :: t.HashMap<Instance, Tree>
 	self.Inject = inject :: t.Injection
+	-- Acts as an indicator of this Forest being the Shared forest
+	self.GlobalForest = globalForest
 
 	return self
 end
@@ -26,13 +28,9 @@ end
 function Forest:AddTree(root: ModuleScript, eager_array: t.Array<ModuleScript>)
 	assert(not self.AggregatedHashMap[root], "Attempt to add preexisting Module" ..
 		root.Name .. " to Internal Module Hierarchy")
-	
-	--[[
-	Here account for new one being higher, but not being lower
-	Check for new one being lower and error!
-	]]
+		
 	local old_tree
-	for _, tree in pairs(self.Trees) do
+	for _, tree: Tree in pairs(self.Trees) do
 		if (tree.Root :: Node):CheckAncestry(root) then
 			warn("Attempt to add a module that is an ancestor of a previously added module. " .. 
 				"Attempting conflict resolution.")
@@ -51,23 +49,10 @@ function Forest:AddTree(root: ModuleScript, eager_array: t.Array<ModuleScript>)
 	self:RecomputeAggregatedHashMap()
 end
 
-function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): (boolean, any?)
-	--[[
-	This doesn't work for shared from global!
-
-	Shared can't require a global module which makes sense.
-	But a global module should be able to require a shared module!
-	Possibly add a flag to the forest to make it a shared forest.
-	Then here, rework this so that source_tree is compared to target_tree
-	only if source tree exists, i.e. when there is a module in shared requiring
-	another module in shared.
-	
-	Need to add an aggregated check to make sure that the module isn't external within
-	the modulemanager.
-	]]
+function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): any?
 	local source_tree: Tree? = self.AggregatedHashMap[source]
-	assert(source_tree, "Attempt to illegaly retrieve a module from an external module: " 
-		.. source.Name)
+	assert(source_tree or (self.GlobalForest and self.GlobalForest.AggregatedHashMap[source]),
+		"Attempt to illegaly retrieve a module from an external module: " .. source.Name)
 	
 	local target_name: string? = table.remove(path, 1);
 	assert(target_name, "Attempt to retrieve module with no path")
@@ -75,21 +60,21 @@ function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): (boolean,
 	local target_tree = self.Trees[target_name]
 	assert(target_tree, "Attempt to retrieve uninitialised module" .. target_name)
 	
-	if not source_tree == target_tree then
+	if (not source_tree == target_tree) and (not self.GlobalForest) then
 		warn("Attempt to access member of other hierarchy. Consider moving "
 			.. target_name .. " to Shared.")
 	end
 	
 	local target: Node
 	for _, v in ipairs(path) do
-		local success, message = pcall(function()
+		local success, _ = pcall(function()
 			target = target_tree[v]
 		end)
 		assert(success, "Attempt to retrieve non-loaded module")
 	end
 	assert(target, "Attempt to retrieve non-loaded module")
 	
-	return true, target:GetContent(self.Inject)
+	return target:GetContent(self.Inject)
 end
 
 function Forest:RecomputeAggregatedHashMap()
