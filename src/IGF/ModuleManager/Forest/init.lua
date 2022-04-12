@@ -70,7 +70,7 @@ function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): any?
 		local success, _ = pcall(function()
 			target = target_tree[v]
 		end)
-		assert(success, "Attempt to retrieve external module: " .. table.concat(path, ".", 1, i))
+		assert(success, "Attempt to retrieve external module: " .. table.concat(path, ".", 1, i-1))
 	end
 	assert(target, "Attempt to retrieve external module: " .. table.concat(path, "."))
 	
