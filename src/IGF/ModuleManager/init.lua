@@ -7,7 +7,7 @@
         Full notice in IGF.lua		]]--
 
 local t = require(script.Parent.Types)
-local c = require(script.Parent.t)
+local c = require(script.Parent.c)
 local Catcher = require(script.Parent.Catcher)
 local Forest = require(script.Forest)
 local Promise = require(script.Parent.Promise)
