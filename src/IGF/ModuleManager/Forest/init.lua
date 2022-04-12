@@ -58,7 +58,7 @@ function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): any?
 	assert(target_name, "Attempt to retrieve module with no path")
 	
 	local target_tree = self.Trees[target_name]
-	assert(target_tree, "Attempt to retrieve uninitialised module" .. target_name)
+	assert(target_tree, "Attempt to retrieve external module: " .. target_name)
 	
 	if (not source_tree == target_tree) and (not self.GlobalForest) then
 		warn("Attempt to access member of other hierarchy. Consider moving "
@@ -66,13 +66,13 @@ function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): any?
 	end
 	
 	local target: Node
-	for _, v in ipairs(path) do
+	for i, v in ipairs(path) do
 		local success, _ = pcall(function()
 			target = target_tree[v]
 		end)
-		assert(success, "Attempt to retrieve non-loaded module")
+		assert(success, "Attempt to retrieve external module: " .. table.concat(path, ".", 1, i))
 	end
-	assert(target, "Attempt to retrieve non-loaded module")
+	assert(target, "Attempt to retrieve external module: " .. table.concat(path, "."))
 	
 	return target:GetContent(self.Inject)
 end
@@ -81,7 +81,7 @@ function Forest:RecomputeAggregatedHashMap()
 	self.AggregatedHashMap = {} :: t.HashMap<Instance, Tree>
 	
 	for _, tree in pairs(self.Trees :: t.Dict<Tree>) do
-		for mod, node in pairs(tree.NodeMap) do
+		for mod, _ in pairs(tree.NodeMap) do
 			self.AggregatedHashMap[mod] = tree
 		end
 	end
