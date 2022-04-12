@@ -25,7 +25,7 @@ function ModuleManager.new(inject: t.Injection): ModuleManager
 end
 
 function ModuleManager:GetCatcherHandler(from: ModuleScript)
-    local function call(path: t.Array<string>, args: {any}?)
+    return function(path: t.Array<string>, args: {any}?)
         local shared;
         if path[1] == "Shared" then
             shared = true;
@@ -60,8 +60,6 @@ function ModuleManager:GetCatcherHandler(from: ModuleScript)
             end)
         end)
     end
-
-    return call
 end
 
 type ModuleManager = typeof(ModuleManager.new(print))
