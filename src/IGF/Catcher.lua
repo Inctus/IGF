@@ -1,10 +1,10 @@
 --!strict
---[[	Catcher.lua | Copyright Notice
+--[[    Catcher.lua | Copyright Notice
 
         INC Game Framework - OS Game Framework for Roblox
         Copyright (C) 2022 Inctus (Haashim-Ali Hussain)
                 
-        Full notice in IGF.lua		]]--
+        Full notice in IGF.lua      ]]--
 
 function appendTo(t, v)
     local _t = table.create(#t+1)

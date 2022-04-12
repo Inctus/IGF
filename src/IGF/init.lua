@@ -1,5 +1,5 @@
 --!strict
---[[	IGF.lua | Full Copyright Notice
+--[[    IGF.lua | Full Copyright Notice
 
         INC Game Framework - OS Game Framework for Roblox
         Copyright (C) 2022 Inctus (Haashim-Ali Hussain)
@@ -43,12 +43,12 @@ function IGF.new(): IGF
 
     -- DATA MANAGER HANDLES IMPLICIT DATA REPLICATION AND SUBSCRIPTIONS
     -- self.DataManager = DataManager.new()
-    -- READ WRITE PERMISSIONS 			| 	Server 	|	Client 	|
-    -- SERVER DATA						|		rw 	| 		--	|
-    -- CLIENT DATA						|   	--	|		rw	|
-    -- SHARED DATA						|		rw	|		r-	|
-    --									|----------	|	Owner	|	Other 	|
-    -- CLIENT SPECIFIC SHARED DATA 	    |   	rw	|		rw	|		--	|
+    -- READ WRITE PERMISSIONS           |   Server  |   Client  |
+    -- SERVER DATA                      |       rw  |       --  |
+    -- CLIENT DATA                      |       --  |       rw  |
+    -- SHARED DATA                      |       rw  |       r-  |
+    --                                  |---------- |   Owner   |   Other   |
+    -- CLIENT SPECIFIC SHARED DATA      |       rw  |       rw  |       --  |
 
     return self
 end
@@ -59,18 +59,20 @@ function IGF:GetInjection()
 end
 
 function IGF:GetServerInjection()
-    local serverCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
-
-    end)
+    local server = {
+        Modules = ModuleCatcher;
+        Data = DataCatcher;
+    }
     local clientsCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
 
     end)
 end
 
 function IGF:GetClientInjection()
-    local clientCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
-
-    end)
+    local client = {
+        Modules = ModuleCatcher;
+        Data = DataCatcher;
+    }
     local clientsCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
 
     end)
