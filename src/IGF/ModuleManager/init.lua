@@ -25,7 +25,7 @@ function ModuleManager.new(inject: t.Injection): ModuleManager
 end
 
 function ModuleManager:GetCatcherHandler(from: ModuleScript)
-    return function(path: t.Array<string>, args: {any}?)
+    return function(path: t.Array<string>, args: {any}?): Promise
         local shared;
         if path[1] == "Shared" then
             shared = true;
@@ -65,5 +65,6 @@ end
 type ModuleManager = typeof(ModuleManager.new(print))
 type Forest = typeof(Forest.new(print))
 export type Catcher = typeof(Catcher.new(print))
+export type Promise = typeof(Promise.new())
 
 return ModuleManager
