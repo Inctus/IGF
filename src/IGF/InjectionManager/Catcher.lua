@@ -8,13 +8,6 @@
 
 local Catcher = {}
 
-function Catcher.new(called, path)
-    return setmetatable({}, {
-        __call = function(_, ...) return called(path, {...}) end;
-        __index = function(_, i) return Catcher.new(called, appendTo(path, i)) end;
-    })
-end
-
 function Catcher.strictEscape(context, escapes)
     return setmetatable({}, {
         __index = function(_, i)

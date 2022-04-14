@@ -23,6 +23,7 @@
 local ModuleManager = require(script.ModuleManager)
 local DataManager = require(script.DataManager)
 local InjectionManager = require(script.InjectionManager)
+local NetworkManager = require(script.NetworkManager)
 
 --<< REPOSITORY METATABLE >>
 
@@ -34,9 +35,10 @@ IGF.__index = IGF
 function IGF.new(): IGF
     local self = setmetatable({}, IGF) :: IGF
 
-    self.DataManager = DataManager.new()
-    self.ModuleManager = ModuleManager.new(self:GetInjector())
-    self.InjectionManager = InjectionManager.new(self.DataManager, self.ModuleManager)
+    self.InjectionManager = InjectionManager.new(IGF)
+    self.DataManager = DataManager.new(IGF)
+    self.ModuleManager = ModuleManager.new(IGF)
+    self.NetworkManager = NetworkManager.new(IGF)
 
     -- DATA MANAGER HANDLES IMPLICIT DATA REPLICATION AND SUBSCRIPTIONS
     -- self.DataManager = DataManager.new()

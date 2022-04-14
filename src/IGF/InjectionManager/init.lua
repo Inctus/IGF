@@ -22,11 +22,10 @@ function extend(context, index)
     return _n
 end
 
-function InjectionManager.new(ModuleManager, DataManager)
+function InjectionManager.new(IGF)
     local self = setmetatable({}, InjectionManager)
 
-    self.ModuleManager = ModuleManager
-    self.DataManager = DataManager
+    self.IGF = IGF
 
     return self
 end

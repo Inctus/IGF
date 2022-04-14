@@ -14,9 +14,10 @@ local Promise = require(script.Parent.Promise)
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
-function ModuleManager.new(inject: t.Injection): ModuleManager
+function ModuleManager.new(IGF): ModuleManager
     local self = setmetatable({}, ModuleManager)
 
+    local inject = IGF.InjectionManager:GetInjector()
     self.MainForest = Forest.new(inject) :: Forest
     self.SharedForest = Forest.new(inject, self.MainForest) :: Forest
 
