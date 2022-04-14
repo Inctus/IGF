@@ -8,7 +8,6 @@
 
 local t = require(script.Parent.Types)
 local c = require(script.Parent.c)
-local Catcher = require(script.Parent.Catcher)
 local Forest = require(script.Forest)
 local Promise = require(script.Parent.Promise)
 
@@ -27,11 +26,11 @@ end
 function ModuleManager:GetCatcherHandler(from: ModuleScript)
     return function(path: t.Array<string>, args: {any}?): Promise
         local shared;
-        if path[1] == "Shared" then
+        if path[1]:lower() == "shared" then
             shared = true;
             table.remove(path, 1)
         end
-        if path[1] == "add" then
+        if path[1]:lower() == "add" then
             return Promise.try(function()
                 assert(args and #args > 0, "Attempt to add module but none was provided.")
                 assert(c.tuple(c.Instance, c.optional(c.table))(unpack(args)))
@@ -42,7 +41,7 @@ function ModuleManager:GetCatcherHandler(from: ModuleScript)
                 end
             end)
         end
-        if path[#path] == "require" then
+        if path[#path]:lower() == "require" then
             table.remove(path)
             Promise.try(function()
                 return if shared then self.SharedForest:Retrieve(from, path)
@@ -64,7 +63,6 @@ end
 
 type ModuleManager = typeof(ModuleManager.new(print))
 type Forest = typeof(Forest.new(print))
-export type Catcher = typeof(Catcher.new(print))
 export type Promise = typeof(Promise.new())
 
 return ModuleManager
