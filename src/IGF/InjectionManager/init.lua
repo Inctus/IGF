@@ -63,6 +63,31 @@ function InjectionManager:GetStartCatcher(context)
     })
 end
 
+function InjectionManager:GetClientsCatcher(context)
+    return Catcher.strictEscape(context, {
+        All = function(oldContext)
+            --TODO() eval context
+            local newContext = {}
+            return self:GetStartCatcher(newContext)
+        end;
+        Some = function(oldContext)
+            --TODO() eval context
+            local newContext = {}
+            return function(filter)
+                local clients = {}
+                -- filter clients
+                -- filter(clients)
+                return self:GetStartCatcher(newContext)
+            end
+        end;
+        Others = function(oldContext)
+            --TODO() eval context
+            local newContext = {}
+            return self:GetStartCatcher(newContext)
+        end;
+    })
+end
+
 function InjectionManager:GetModuleCatcher(context)
     return Catcher.strictIndexableEscape(context, {
             Shared = function(oldContext)
@@ -99,9 +124,7 @@ function InjectionManager:GetThirdModuleCatcher(context)
             end;
         }, function(oldContext, args)
             --TODO() eval oldContext
-            return function(...)
-                -- pipe it into module run :main
-            end
+            -- pipe it into module run :main
         end
     )
 end
