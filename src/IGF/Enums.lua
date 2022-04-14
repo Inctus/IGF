@@ -15,4 +15,4 @@ return {
         ServerPrivate = "ServerPrivate";
         ClientPrivate = "ClientPrivate";
     } :: t.Dict<t.DataContext>
-} :: t.Dict<t.Dict<string>>
+}
