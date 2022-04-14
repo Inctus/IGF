@@ -15,18 +15,6 @@ function Catcher.new(called, path)
     })
 end
 
--- function escapeCatcherPath(path, escapes)
---     return setmetatable({}, {
---         __index = function(_, i)
---             if escapes[i] then
---                 return escapes[i](path)
---             else
---                 return escapeCatcherPath(appendTo(path, i), escapes)
---             end
---         end
---     })
--- end
-
 function Catcher.strictEscape(context, escapes)
     return setmetatable({}, {
         __index = function(_, i)
@@ -77,55 +65,5 @@ function Catcher.callableEscape(context, escapes, called)
         end
     })
 end
-
-
--- function callableEscapeCatcherPath(path, escapes, called)
---     return setmetatable({}, {
---         __index = function(_, i)
---             if escapes[i] then
---                 return escapes[i](path)
---             else
---                 return callableEscapeCatcherPath(appendTo(path, i), escapes, called)
---             end
---         end;
---         __call = function(_, ...)
---             return called(path, {...})
---         end
---     }
--- end
-
--- function appendTo(t, v)
---     local _t = table.create(#t+1)
---     _t[#t+1] = v
---     return table.move(t, 1, #t, 1, _t)
--- end
-
--- local Data2 = Catcher.escape({
---     extend = function(self, i)
---         local new = {}
---         new.path = appendTo(self.path, i)
---         for k, v in pairs(self) do
---             if k ~= "path" then
---                 new[k] = v
---             end
---         end
---         return new
---     end;
---     },
---     {
---         get = function(context)
-
---         end;
---         set = function(context)
-
---         end;
---         rawSet = function(context)
-
---         end;
---         initialise = function(context)
-
---         end;
---     }
--- )
 
 return Catcher
