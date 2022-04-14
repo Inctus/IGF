@@ -20,13 +20,9 @@
         along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]]
 
-local RunService = game:GetService("RunService")
-
-local t = require(script.Types)
 local ModuleManager = require(script.ModuleManager)
 local DataManager = require(script.DataManager)
-local Catcher = require(script.Catcher)
-local Promise = require(script.Promise)
+local InjectionManager = require(script.InjectionManager)
 
 --<< REPOSITORY METATABLE >>
 
@@ -39,7 +35,8 @@ function IGF.new(): IGF
     local self = setmetatable({}, IGF) :: IGF
 
     self.DataManager = DataManager.new()
-    self.ModuleManager = ModuleManager.new(self:GetInjection())
+    self.ModuleManager = ModuleManager.new(self:GetInjector())
+    self.InjectionManager = InjectionManager.new(self.DataManager, self.ModuleManager)
 
     -- DATA MANAGER HANDLES IMPLICIT DATA REPLICATION AND SUBSCRIPTIONS
     -- self.DataManager = DataManager.new()
@@ -48,34 +45,9 @@ function IGF.new(): IGF
     -- CLIENT DATA                      |       --  |       rw  |
     -- SHARED DATA                      |       rw  |       r-  |
     --                                  |---------- |   Owner   |   Other   |
-    -- CLIENT SPECIFIC SHARED DATA      |       rw  |       rw  |       --  |
+    -- CLIENT SPECIFIC SHARED DATA      |       rw  |       rw  |       r-  |
 
     return self
-end
-
-function IGF:GetInjection()
-    return RunService:IsClient() and self:GetClientInjection()
-        or RunService:IsServer() and self:GetServerInjection()
-end
-
-function IGF:GetServerInjection()
-    local server = {
-        Modules = ModuleCatcher;
-        Data = DataCatcher;
-    }
-    local clientsCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
-
-    end)
-end
-
-function IGF:GetClientInjection()
-    local client = {
-        Modules = ModuleCatcher;
-        Data = DataCatcher;
-    }
-    local clientsCatcher = Catcher.new(function(path: t.Array<string>, args: {any}?)
-
-    end)
 end
 
 export type IGF = typeof(IGF.new())
