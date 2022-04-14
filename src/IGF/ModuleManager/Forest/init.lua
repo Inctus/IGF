@@ -21,6 +21,7 @@ function Forest.new(inject: t.Injection, globalForest: Forest?): Forest
     self.Inject = inject :: t.Injection
     -- Acts as an indicator of this Forest being the Shared forest
     self.GlobalForest = globalForest
+    self.Shared = (globalForest ~= nil) :: boolean
 
     return self
 end
@@ -51,29 +52,24 @@ end
 
 function Forest:Retrieve(source: ModuleScript, path: t.Array<string>): any?
     local source_tree: Tree? = self.AggregatedHashMap[source]
-    assert(source_tree or (self.GlobalForest and self.GlobalForest.AggregatedHashMap[source]),
+    assert(source_tree or (self.Shared and self.GlobalForest.AggregatedHashMap[source]),
         "Attempt to illegaly retrieve a module from an external module: " .. source.Name)
-    
-    local target_name: string? = table.remove(path, 1);
-    assert(target_name, "Attempt to retrieve module with no path")
-    
-    local target_tree = self.Trees[target_name]
-    assert(target_tree, "Attempt to retrieve external module: " .. target_name)
-    
-    if (not source_tree == target_tree) and (not self.GlobalForest) then
-        warn("Attempt to access member of other hierarchy. Consider moving "
-            .. target_name .. " to Shared.")
-    end
+    assert(#path > 0, "Attempt to retrieve module with no path")
     
     local target: Node
-    for i, v in ipairs(path) do
-        local success, _ = pcall(function()
-            target = target_tree[v]
-        end)
-        assert(success, "Attempt to retrieve external module: " .. table.concat(path, ".", 1, i-1))
+    if (not self.Shared or source_tree) then 
+        target = source_tree:Retrieve(path, source_tree.NodeMap[source]) 
+    else 
+        local target_name: string = table.remove(path, 1) or ""
+        local target_tree = self.Trees[target_name]
+        assert(target_tree, "Attempt to retrieve unknown module: " .. self.Shared and "Shared." or "" 
+            .. target_name)
+        assert(self.Shared or source_tree == target_tree, 
+            "Attempt to access member of other hierarchy. Consider moving " .. target_name 
+            .. " to Shared.")
+        target_tree:Retrieve(path)
     end
-    assert(target, "Attempt to retrieve external module: " .. table.concat(path, "."))
-    
+
     return target:GetContent(self.Inject)
 end
 

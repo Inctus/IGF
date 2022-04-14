@@ -8,7 +8,6 @@
 
 local t = require(script.Parent.Parent.Parent.Types)
 local Node = require(script.Node)
-local Catcher = require(script.Parent.Parent.Parent.Catcher)
 
 local Tree = {}; Tree.__index = Tree
 
@@ -69,10 +68,21 @@ function Tree:Initialise(inject)
 	self.Root:Load(inject)
 end
 
+function Tree:Retrieve(path: t.Array<string>, startNode: Node?): Node
+	local target = startNode or self.Root
+	for i, v in ipairs(path) do
+        local success, _ = pcall(function()
+            target = target.Children[v]
+        end)
+        assert(success, "Attempt to retrieve unknown module")
+    end
+    assert(target, "Attempt to retrieve unknown module")
+    return target
+end 
+
 --<< TYPES >>
 
 type Node = typeof(Node.new(script, false))
 type Tree = typeof(Tree.construct(script, {}))
-type Catcher = typeof(Catcher.new(print,print,print))
 
 return Tree
