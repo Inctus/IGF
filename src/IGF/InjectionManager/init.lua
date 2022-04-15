@@ -1,194 +1,155 @@
 local RunService = game:GetService("RunService")
 
 local Catcher = require(script.Catcher)
+local Context = require(script.Context)
 
 local InjectionManager = {}
 InjectionManager.__index = InjectionManager
-
-function appendTo(t, v)
-    local _t = table.create(#t+1)
-    _t[#t+1] = v
-    return table.move(t, 1, #t, 1, _t)
-end
-
-function extend(context, index)
-    local _n = {}
-    for k, v in pairs(context) do
-        if k ~= "path" then
-            _n[k] = v
-        end
-    end
-    _n.path = appendTo(context.path, index)
-    return _n
-end
 
 function InjectionManager.new(IGF)
     local self = setmetatable({}, InjectionManager)
 
     self.IGF = IGF
+    self.IsServer = RunService:IsServer()
+    self.IsClient = RunService:IsClient()
 
     return self
 end
 
 function InjectionManager:GetInjector()
-    return self:GetInjectorNamed(if RunService:IsServer() then "Server" else "Client")
-end
-
-function InjectionManager:GetInjectorNamed(name: string)
-    return function(instance: Instance, module: any?)
-        local initialContext = {
-            i = instance;
-            path = {};
-            extend = extend;
-        }
-        local injection = {}
-        injection[name] = self:GetStartCatcher(initialContext)
-        injection.Clients = self:GetClientsCatcher(initialContext)
+    return function(instance: Instance)
+        local initialContext = Context.fromModule(instance)
+        return if self.IsServer
+            then self:GetServerInjection(initialContext)
+            else self:GetClientInjection(initialContext)
     end
 end
 
-function InjectionManager:GetStartCatcher(context)
+function InjectionManager:GetServerInjection(context)
+    local injection = {}
+    injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
+    injection.Clients = self:GetClientsCatcher(context)
+    return injection
+end
+
+function InjectionManager:GetClientInjection(context)
+    local injection = {}
+    injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
+    injection.Clients = self:GetClientsCatcher(context)
+    injection.Client = self:GetDataModuleCatcher(context:clone():addFlag("ClientTarget"))
+    return injection
+end
+
+function InjectionManager:GetDataModuleCatcher(context)
     return Catcher.strictEscape(context, {
         Data = function(oldContext)
-            --TODO() eval oldContext
-            local newContext = {}
-            return self:GetDataCatcher(newContext)
+            return self:GetDataPublicPrivateCatcher(oldContext)
         end;
         Modules = function(oldContext)
-            --TODO() eval oldContext
-            local newContext = {}
-            return self:GetModuleCatcher(newContext)
+            return self:GetModuleSharedCatcher(oldContext)
         end;
     })
 end
 
-function InjectionManager:GetClientsCatcher(context)
-    return Catcher.strictEscape(context, {
-        All = function(oldContext)
-            --TODO() eval context
-            local newContext = {}
-            return self:GetStartCatcher(newContext)
-        end;
-        Some = function(oldContext)
-            --TODO() eval context
-            local newContext = {}
-            return function(filter)
-                local clients = {}
-                -- filter clients
-                -- filter(clients)
-                return self:GetStartCatcher(newContext)
-            end
-        end;
-        Others = function(oldContext)
-            --TODO() eval context
-            local newContext = {}
-            return self:GetStartCatcher(newContext)
-        end;
-    })
-end
-
-function InjectionManager:GetModuleCatcher(context)
+function InjectionManager:GetModuleSharedCatcher(context)
     return Catcher.strictIndexableEscape(context, {
             Shared = function(oldContext)
-                -- TODO() update oldContext
-                local newContext = {}
-                return self:GetSecondModuleCatcher(newContext)
-            end
-        },
-        self:GetSecondModuleCatcher(context)
+                return self:GetModuleAdditionCatcher(oldContext:clone():addFlag("Shared"))
+            end;
+        }, self:GetModuleAdditionCatcher(context)
     )
 end
 
-function InjectionManager:GetSecondModuleCatcher(context)
+function InjectionManager:GetModuleAdditionCatcher(context)
     return Catcher.strictIndexableEscape(context, {
-        add = function(oldContext)
-            -- TODO() eval oldContext
-            local newContext = {}
-            return function(...)
-                -- pipe it into module additions
-            end
-        end
-        }, 
-        self:GetThirdModuleCatcher(context)
-    )
-end
-
-function InjectionManager:GetThirdModuleCatcher(context)
-    return Catcher.callableEscape(context, {
-            ["require"] = function(oldContext)
-                --TODO() eval oldContext
-                return function(...)
-                    -- pipe it into module require
+            add = function(oldContext)
+                assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
+                    "Attempt to add Modules illegaly, across the client-server boundary.")
+                return function(module: ModuleScript)
+                    -- ADD THIS MODULE TO THE MODULE THING
                 end
             end;
-        }, function(oldContext, args)
-            --TODO() eval oldContext
-            -- pipe it into module run :main
+        }, self:GetFinalModuleCatcher(context)
+    )
+end
+
+function InjectionManager:GetFinalModuleCatcher(context)
+    return Catcher.callableEscape(context, {
+            require = function(oldContext)
+                assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
+                    "Attempt to add Modules illegaly, across the client-server boundary.")
+                return function()
+                    -- RETURN THE MODULE FROM THE CURRENT PATH INDEXED
+                end
+            end;
+        },
+        function(...)
+            -- CALL THE CURRENT PATH INDEXED MODULE WITH THE ARGS PASSED
         end
     )
 end
 
-function InjectionManager:GetDataCatcher(context)
+function InjectionManager:GetDataPublicPrivateCatcher(context)
     return Catcher.strictEscape(context, {
             Public = function(oldContext)
-                --TODO() eval oldContext
-                local newContext = {}
-                return self:GetSecondDataCatcher(newContext)
+                return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Public"))
             end;
             Private = function(oldContext)
-                --TODO() eval oldContext
-                local newContext = {}
-                return self:GetSecondDataCatcher(newContext)
+                assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
+                    "Attempt to access private Data illegally, across the client-server boundary.")
+                return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Private"))
             end;
         }
     )
 end
 
-function InjectionManager:GetSecondDataCatcher(context)
+function InjectionManager:GetDataInitialisationCatcher(context)
     return Catcher.strictIndexableEscape(context, {
-        initialise = function(oldContext)
-            --TODO() eval context
-            -- CHECK if data is initialised and ERRORRR
-            return function(initialiser)
-                initialiser(self:GetDataInitialisationCatcher(oldContext))
+            initialise = function(oldContext)
+                assert(oldContext.ServerTarget and (oldContext.Public or oldContext.Private) and self.IsServer
+                    or oldContext.ClientTarget and oldContext.Public and self.IsServer
+                    or oldContext.ClientTarget and oldContext.Private and self.IsClient,
+                    string.format(
+                        "Attempt to define %s%s illegally from %s",
+                        if oldContext.ClientTarget then "Client." else "Server",
+                        if oldContext.Public then "Public" else "Private",
+                        if self.IsClient then "Client" else "Server"
+                    )
+                )
+                -- ADD A CHECK TO SEE IF ITS ALREADY DECLARED
+                return function(initialiser)
+                    initialiser(self:GetDataDeclarationCatcher(oldContext))
+                end
             end
-        end
         },
-        self:GetThirdDataCatcher(context)
+        self:GetFinalDataCatcher(context)
     )
 end
 
-function InjectionManager:GetThirdDataCatcher(context)
+function InjectionManager:GetDataDeclarationCatcher(context)
     return Catcher.escape(context, {
-        get = function(oldContext)
-            --TODO() eval context
-            return function(...)
-                -- pipe args into data get
+        declare = function(oldContext)
+            return function(entity)
+                -- INITIALISE DATA ALONG PATH CURRENTLY INDEXED W ENTITY
             end
-        end;
-        set = function(oldContext)
-            --TODO() eval context
-            return function(...)
-                -- pipe args into data set
-            end
-        end;
-        rawSet = function(oldContext)
-            --TODO() eval context
-            return function(...)
-                -- pipe args into data rawSet
-            end
-        end;
+        end
     })
 end
 
-function InjectionManager:GetDataInitialisationCatcher(context)
+function InjectionManager:GetFinalDataCatcher(context)
     return Catcher.escape(context, {
-        declare = function(oldContext)
-            --TODO() eval context
-            return function(...)
-                -- pipe args into declare data
-            end
-        end
+        get = function(oldContext)
+            -- RETURN FUNC
+        end;
+        set = function(oldContext)
+            -- RETURN FUNC
+        end;
+        rawSet = function(oldContext)
+            -- RETURN FUNC
+        end;
+        subscribe = function(oldContext)
+            -- RETURN FUNC
+        end;
     })
 end
 
