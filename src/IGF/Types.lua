@@ -1,10 +1,11 @@
 -- !strict
 --[[    Types.lua | Copyright Notice
 
-        INC Game Framework - OS Game Framework for Roblox
-        Copyright (C) 2022 Inctus (Haashim-Ali Hussain)
-        
-        Full notice in IGF.lua      ]]--
+        IGF.lua | Full Copyright Notice
+
+        MIT License
+
+        Copyright (c) 2022 Haashim-Ali Hussain      ]]--
 
 export type Array<T> = { [number]: T }
 

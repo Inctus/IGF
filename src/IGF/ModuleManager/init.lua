@@ -7,9 +7,9 @@
         Full notice in IGF.lua      ]]--
 
 local t = require(script.Parent.Types)
-local c = require(script.Parent.c)
+local c = require(script.Parent.Dependencies.c)
 local Forest = require(script.Forest)
-local Promise = require(script.Parent.Promise)
+local Promise = require(script.Parent.Dependencies.Promise)
 
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
