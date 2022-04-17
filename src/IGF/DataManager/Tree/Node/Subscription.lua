@@ -6,7 +6,7 @@
         
         Full notice in IGF.lua      ]]--
 
-local t = require(script.Parent.Parent.Types)
+local t = require(script.Parent.Parent.Parent.Parent.Types)
 local DataElement = require(script.Parent.DataElement)
 
 local Subscription = {}
