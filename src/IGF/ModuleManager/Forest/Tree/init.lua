@@ -70,7 +70,7 @@ end
 
 function Tree:Retrieve(path: t.Array<string>, startNode: Node?): Node
 	local target = startNode or self.Root
-	for i, v in ipairs(path) do
+	for _, v in ipairs(path) do
         local success, _ = pcall(function()
             target = target.Children[v]
         end)
