@@ -2,6 +2,7 @@ local RunService = game:GetService("RunService")
 
 local Catcher = require(script.Catcher)
 local Context = require(script.Context)
+local t = require(script.Parent.Types)
 
 local InjectionManager = {}
 InjectionManager.__index = InjectionManager
@@ -65,8 +66,12 @@ function InjectionManager:GetModuleAdditionCatcher(context)
             add = function(oldContext)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
-                return function(module: ModuleScript)
-                    -- ADD THIS MODULE TO THE MODULE THING
+                return function(...)
+                    if oldContext.Shared then
+                        self.IGF.ModuleManager:AddShared(...)
+                    else
+                        self.IGF.ModuleManager:AddGlobal(...)
+                    end
                 end
             end;
         }, self:GetFinalModuleCatcher(context)
@@ -79,12 +84,12 @@ function InjectionManager:GetFinalModuleCatcher(context)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
                 return function()
-                    -- RETURN THE MODULE FROM THE CURRENT PATH INDEXED
+                    self.IGF.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path))
                 end
             end;
         },
         function(...)
-            -- CALL THE CURRENT PATH INDEXED MODULE WITH THE ARGS PASSED
+            self.IGF.ModuleManager:Run(context.i, table.clone(context.path))
         end
     )
 end
