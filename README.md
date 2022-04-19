@@ -1,6 +1,6 @@
 # IGF - INC Game Framework
 
-[insert buzzwords here]
+An observer-centric, asynchronous, declarative, OOP based tool, with compartmentalised data to minimise replication load, that lets you design your state and effectors separately.
 
 # Timeline
 
