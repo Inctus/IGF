@@ -1,6 +1,6 @@
 # IGF - INC Game Framework
 
-An observer-centric, asynchronous, declarative, OOP based tool, with compartmentalised data to minimise replication load, that lets you design your state and effectors separately. Modules have fine grained hierarchichal limitations, forcing you to ensure your hierarchy is sound and the single responsibility principle is being applied efficiently.
+An observer-centric, asynchronous, OOP based tool, with declarative compartmentalised data to minimise replication load, that lets you design your state and effectors separately. Modules have fine grained hierarchichal limitations, forcing you to ensure your hierarchy is sound and the single responsibility principle is being applied efficiently.
 
 # Timeline
 
