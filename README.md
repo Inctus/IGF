@@ -5,3 +5,9 @@ is a game framework that seamlessly joins server and client modules, with distin
 # Timeline
 
 This project will be completed by mid 2022.
+
+# To-Do:
+
+- DataManager
+- InjectionManager wired into DataManager
+- NetworkManager
