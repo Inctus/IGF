@@ -49,7 +49,7 @@ function Catcher.callableEscape(context, escapes, called)
         __index = function(_, i)
             if escapes[i] then
                 return escapes[i](context)
-            else 
+            else
                 return Catcher.callableEscape(context:extend(i), escapes, called)
             end
         end;
