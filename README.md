@@ -9,7 +9,7 @@ This project will be completed by mid 2022.
 # To-Do:
 
 - Simplify ModuleManager
-  - Convert forest into a HashMap<Instance, MetaData>
+  - ~~Convert forest into a HashMap<Instance, MetaData>~~
   - Wire network calls into NetworkManager
 - DataManager
   - Implement OST
