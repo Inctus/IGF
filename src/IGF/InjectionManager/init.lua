@@ -36,10 +36,11 @@ end
 function InjectionManager:GetClientInjection(context)
     local injection = {}
     injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
-    injection.Clients = self:GetClientsCatcher(context)
     injection.Client = self:GetDataModuleCatcher(context:clone():addFlag("ClientTarget"))
     return injection
 end
+
+-- Need to implement Clients Catcher too!!
 
 function InjectionManager:GetDataModuleCatcher(context)
     return Catcher.strictEscape(context, {
