@@ -4,7 +4,7 @@ An experimental asynchronous reactive OOP based framework that lets you design y
 
 # Timeline
 
-This project will be completed by mid 2022.
+This project will be completed by August 2022.
 
 # To-Do:
 
