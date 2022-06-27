@@ -12,6 +12,7 @@ This project will be completed by August 2022.
   - ~~Convert forest into a HashMap<Instance, MetaData>~~
   - ~~Wire Forest into ModuleManager~~
   - Add Run method to Node
+  - Annotate ModuleManager
 - InjectionManager Additions
   - Create Clients catcher for the Server
   - Use Error module for assertions
