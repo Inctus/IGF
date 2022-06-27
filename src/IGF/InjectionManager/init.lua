@@ -53,11 +53,13 @@ function InjectionManager:GetDataModuleCatcher(context)
 end
 
 function InjectionManager:GetModuleSharedCatcher(context)
-    return Catcher.strictIndexableEscape(context, {
+    return Catcher.strictIndexableEscape(
+        context, {
             Shared = function(oldContext)
                 return self:GetModuleAdditionCatcher(oldContext:clone():addFlag("Shared"))
             end;
-        }, self:GetModuleAdditionCatcher(context)
+        },
+        self:GetModuleAdditionCatcher(context)
     )
 end
 
@@ -67,11 +69,7 @@ function InjectionManager:GetModuleAdditionCatcher(context)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
                 return function(...)
-                    if oldContext.Shared then
-                        self.IGF.ModuleManager:AddShared(...)
-                    else
-                        self.IGF.ModuleManager:AddGlobal(...)
-                    end
+                    self.IGF.ModuleManager:Add(oldContext.Shared, ...)
                 end
             end;
         }, self:GetFinalModuleCatcher(context)
@@ -84,12 +82,12 @@ function InjectionManager:GetFinalModuleCatcher(context)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
                 return function()
-                    self.IGF.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path))
+                    self.IGF.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path), oldContext.Shared)
                 end
             end;
         },
         function(...)
-            self.IGF.ModuleManager:Run(context.i, table.clone(context.path))
+            self.IGF.ModuleManager:Run(context.i, table.clone(context.path), oldContext.Shared, ...)
         end
     )
 end

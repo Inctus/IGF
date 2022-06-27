@@ -14,7 +14,7 @@ function Catcher.strictEscape(context, escapes)
             if escapes[i] then
                 return escapes[i](context)
             else
-                error("Illegal index")
+                return nil
             end
         end
     })
