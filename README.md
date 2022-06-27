@@ -10,14 +10,17 @@ This project will be completed by mid 2022.
 
 - Simplify ModuleManager
   - ~~Convert forest into a HashMap<Instance, MetaData>~~
-  - Wire network calls into NetworkManager
+  - Wire Forest into ModuleManager
+- InjectionManager Additions
+  - Create Clients catcher for the Server
+  - Use Error module for assertions
+  - Wire network calls into NetworkManager from both Data and Module catchers
 - DataManager
-  - Implement OST
+  - Implement Observable State Tree
   - Add server client checks and store relevant OST
   - Link OST to listeners using NetworkManager
-  - Wire network calls to NetworkManager
-- InjectionManager wired into DataManager, ModuleManager
 - NetworkManager
+
 
 NetworkManager
 
