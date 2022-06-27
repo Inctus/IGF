@@ -20,7 +20,11 @@ This project will be completed by mid 2022.
 - NetworkManager
 
 NetworkManager
+
 ModuleManager <- NetworkManager
+
 DataManager <- NetworkManager
+
 InjectionManager <- ModuleManager, DataManager
+
 ModuleManager <- InjectionManager.Injection
