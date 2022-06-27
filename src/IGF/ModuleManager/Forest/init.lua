@@ -1,10 +1,9 @@
 --!strict
---[[    Forest.lua | Copyright Notice
-
-        INC Game Framework - OS Game Framework for Roblox
-        Copyright (C) 2022 Inctus (Haashim-Ali Hussain)
-
-        Full notice in IGF.lua      ]]--
+--[[
+    This is the Module Forest. It is used to store Added modules in the Framework.
+    Each Module is wrapped with metadata forming a Node. This allows for Lazy Loading
+    of Modules, and safe, managed retrieval of Modules from other known Modules
+]]
 
 local t = require(script.Parent.Parent.Types)
 local e = require(script.Parent.Parent.Error)
@@ -47,6 +46,9 @@ do
             e.Forest.PreexistingInsert(to_add.Name, if is_shared then SHARED else PRIVATE)
         end
         self.Nodes[to_add] = Node.new(to_add, eager, is_shared)
+        if eager then
+            self.Nodes[to_add]:Load(self.Inject, self.Nodes)
+        end
         -- Recursively add all children too
         for _, child in to_add:GetChildren() do
             self:Add(child, eager, is_shared)
@@ -57,7 +59,7 @@ do
     --PRE:  The root to be added isn't in the tree already. The eager_array only contains instances descendant from root
     --POST: The root to be added is added to the Forest
     function Forest:AddTree(root: Instance, eager_array: t.Array<Instance>, is_shared: boolean)
-        e.Forest.EmptyInsert(root, if is_shared then "Shared" else "Private")
+        e.Forest.EmptyInsert(root, if is_shared then SHARED else PRIVATE)
         -- Create a dictionary for easier lookup
         local eager_dictionary = {}
         for _, instance in eager_array do
@@ -141,7 +143,7 @@ do
         end
         e.Forest.RetrievalFailure(target_node, u.prettifyPath(path), source.Name)
 
-        return target_node:GetContents(self.Inject)
+        return target_node:GetContents(self.Inject, self.Nodes)
     end
 
     type Forest = typeof(Forest.new(print))

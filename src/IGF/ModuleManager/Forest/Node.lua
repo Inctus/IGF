@@ -39,9 +39,10 @@ do
     --INFO: Loads a node recursively
     --PRE:  The Node isn't already loaded
     --POST: Recursively loads all sub-nodes then this node
-    function Node:EagerLoad(inject: t.Injection)
-        for _, sub_child  in pairs(self.Children) do
-            sub_child:EagerLoad(inject)
+    function Node:EagerLoad(inject: t.Injection, forest: t.HashMap<Instance, Node>)
+        for _, sub_child in self.I:GetChildren() do
+            local sub_node = forest[sub_child]
+            sub_node:EagerLoad(inject)
         end
 
         self:LazyLoad(inject)
@@ -50,9 +51,9 @@ do
     --INFO: Loads a node
     --PRE: The node isn't loaded
     --POST: The node is loaded based off of its Lazy flag
-    function Node:Load(inject: t.Injection)
+    function Node:Load(inject: t.Injection, forest: t.HashMap<Instance, Node>)
         if self.Eager then
-            self:EagerLoad(inject)
+            self:EagerLoad(inject, forest)
         else
             self:LazyLoad(inject)
         end
@@ -61,9 +62,9 @@ do
     --INFO: Gets the contents of the node
     --PRE:  Injection injects the relevant information for Loading
     --POST: The content of the load is returned
-    function Node:GetContent(inject: t.Injection)
+    function Node:GetContent(inject: t.Injection, forest: t.HashMap<Instance, Node>)
         if not self.Loaded then
-            self:Load(inject)
+            self:Load(inject, forest)
         end
 
         return self.Content
