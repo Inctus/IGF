@@ -70,6 +70,13 @@ do
         return self.Content
     end
 
+    --INFO: Runs the current node
+    --PRE:  The Node is a ModuleScript with a Main
+    --POST: The Node is ran
+    function Node:Run(...)
+        --TODO()
+    end
+
     --INFO: Verifies whether a given ancestor is a ancestor of the current Node
     --PRE:  The ancestor is non-nil
     --POST: If the ancestor is an ancestor of the current node is returned

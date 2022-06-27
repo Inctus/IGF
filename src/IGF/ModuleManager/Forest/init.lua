@@ -143,7 +143,7 @@ do
         end
         e.Forest.RetrievalFailure(target_node, u.prettifyPath(path), source.Name)
 
-        return target_node:GetContents(self.Inject, self.Nodes)
+        return target_node
     end
 
     type Forest = typeof(Forest.new(print))
