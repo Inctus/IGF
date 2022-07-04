@@ -60,7 +60,7 @@ do
         end)
     end
 
-    type ModuleManager = typeof(ModuleManager.new(print))
+    type ModuleManager = typeof(ModuleManager.new())
     type Forest = typeof(Forest.new(print))
     type Promise = typeof(Promise.new())
 

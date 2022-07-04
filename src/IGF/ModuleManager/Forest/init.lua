@@ -8,7 +8,7 @@
 local Types = require(script.Parent.Parent.Types)
 local Error = require(script.Parent.Parent.Error)
 local Utility = require(script.Parent.Parent.Utility)
-local Node = require(script.Parent.Node)
+local Node = require(script.Node)
 
 --INFO: Forest class to store Modules from the current context
 local Forest = {}
@@ -45,7 +45,7 @@ do
             end
             Error.Forest.PreexistingInsert(to_add.Name, if is_shared then SHARED else PRIVATE)
         end
-        self.Nodes[to_add] = Node.new(to_add, eager, is_shared)
+        self.Nodes[to_add] = Node.new(to_add, eager[to_add], is_shared)
         if eager then
             self.Nodes[to_add]:Load(self.Inject, self.Nodes)
         end
@@ -147,7 +147,7 @@ do
     end
 
     type Forest = typeof(Forest.new(print))
-    type Node = typeof(Node.new(script, false))
+    type Node = typeof(Node.new(script, false, false))
 
 end
 

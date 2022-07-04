@@ -116,6 +116,6 @@ Error.InjectionManager.RunFromServerToclient = Error.assertf("Attempt to run Mod
 Error.InjectionManager.RunFromClientToServer = Error.assertf("Attempt to run Module from Client Source '%s' along path 'Server -> %s'", true, Error.LOGICAL)
 Error.InjectionManager.PrivateDataServerToClient = Error.assertf("Attempt to access Private Client data from Server Source '%s'", true, Error.LOGICAL)
 Error.InjectionManager.PrivateDataClientToServer = Error.assertf("Attempt to access Private Client data from Server Source '%s'", true, Error.LOGICAL)
-Error.InjectionManager.IllegalDefinition = Error.asserf("Illegaly defining %s.%s from %s Source '%s'", true, Error.LOGICAL)
+Error.InjectionManager.IllegalDefinition = Error.assertf("Illegaly defining %s.%s from %s Source '%s'", true, Error.LOGICAL)
 
 return Error

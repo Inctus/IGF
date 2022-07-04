@@ -92,8 +92,8 @@ do
         return ancestor and ancestor:IsAncestorOf(self.I)
     end
 
-end
+    type Node = typeof(Node.new(script, false, false))
 
-type Node = typeof(Node.new(script, false))
+end
 
 return Node
