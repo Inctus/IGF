@@ -19,7 +19,6 @@ This project will be completed by August 2022.
   - Create ModuleContentCatcher
   - Add Init handling to when injecting, to return the proxy and content catcher
   - Use Error module for assertions
-  - Add a Require Module Catcher to catch module requiring, to allow for hidden injection into function calls of Modules and Classes alike
   - Wire network calls into NetworkManager from both Data and Module catchers
 - DataManager
   - Implement Observable State Tree
