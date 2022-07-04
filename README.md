@@ -17,8 +17,8 @@ This project will be completed by August 2022.
 - ~~Create Enums~~
 - InjectionManager Additions
   - Create Clients catcher for the Server
-  - Create ModuleContentCatcher
-  - Add Init handling to when injecting, to return the proxy and content catcher
+  - ~~Create tableWrapperCatcher~~
+  - ~~Add Init handling to when injecting, to return the proxy and content catcher~~
   - ~~Use Error module for assertions~~
   - Wire network calls into NetworkManager from both Data and Module catchers
   - ~~Inject Enums into the Proxy directly as a reference to the Enums table~~
