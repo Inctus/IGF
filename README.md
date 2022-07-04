@@ -31,4 +31,4 @@ This project will be completed by August 2022.
 - NetworkManager
   - Support for cross-boundary subscriptions
   - Support for cross-boundary state tree replication
-- Avoid cyclic dependency of top-level Modules by making `NetworkManager` then `ModuleManager` then `DataManager` and then `InjectionManager` with `NetworkManager`, `ModuleManager` and `DataManager`, and finally passing in `InjectionManager.Injection` into `ModuleManager`
+- ~~Avoid cyclic dependency of top-level Modules by making `NetworkManager` then `ModuleManager` then `DataManager` and then `InjectionManager` with `NetworkManager`, `ModuleManager` and `DataManager`, and finally passing in `InjectionManager.Injection` into `ModuleManager`~~
