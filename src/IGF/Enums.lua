@@ -26,6 +26,7 @@ Enums.StaticFilter = {}
 Enums.StaticFilter.All = 1
 Enums.StaticFilter.Whitelist = 2
 Enums.StaticFilter.Blacklist = 3
+export type StaticFilter = number
 
 makeReadOnly("Enums", Enums)
 

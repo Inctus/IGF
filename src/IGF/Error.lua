@@ -118,4 +118,6 @@ Error.InjectionManager.PrivateDataServerToClient = Error.assertf("Attempt to acc
 Error.InjectionManager.PrivateDataClientToServer = Error.assertf("Attempt to access Private Client data from Server Source '%s'", true, Error.LOGICAL)
 Error.InjectionManager.IllegalDefinition = Error.assertf("Illegaly defining %s.%s from %s Source '%s'", true, Error.LOGICAL)
 
+Error.InjectionManager.InvalidFilterType = Error.errorf("Illegal Enums.StaticFilter provided '%d' from %s.init", true, Error.LOGICAL)
+
 return Error

@@ -39,17 +39,32 @@ do
         --      And the IGF proxy for it
         --PRE:  The Instance is the corresponding Module for ModuleContent
         --POST: The Proxies are returned
-        return function(instance: Instance, module_content: table)
-            local initialContext = Context.fromModule(instance)
-            --TODO() Modify this to return a ModuleCatcher
-            --RUN THE INIT HERE
-            --CAPTURE THE ENUM AND BLACKLIST/WHITELIST
-            --CONSTRUCT CATCHER WITH ALL THIS INFO
-            --FINALLY CALL STATIC METHOD WITH THE PROXY GIVEN
-            --old code:
-            -- return if self.IsServer
-            --     then self:GetServerInjection(initialContext)
-            --     else self:GetClientInjection(initialContext)
+        return function(instance: Instance, module_content: {any})
+            local context = Context.fromModule(instance)
+            local IGF_proxy = if self.IsServer then self:GetServerInjection(context) else self:GetClientInjection(context)
+            local content_proxy
+
+            if module_content.init then
+                local static_filter_type, list = module_content.init(IGF_proxy)
+
+                local _temp_list = {}
+                for _, filter in list do
+                    _temp_list[filter] = true
+                end
+                list = _temp_list
+
+                if static_filter_type then
+                    if static_filter_type == Enums.StaticFilter.All 
+                        or static_filter_type == Enums.StaticFilter.Blacklist 
+                            or static_filter_type == Enums.StaticFilter.Whitelist then
+                        content_proxy = Catcher.tableWrapper(module_content, IGF_proxy, static_filter_type, list)
+                    else
+                        Error.InjectionManager.InvalidFilterType(static_filter_type, context.i)
+                    end
+                end
+            end
+
+            return IGF_proxy, content_proxy
         end
     end
 
@@ -70,7 +85,7 @@ do
             return Error.errorf(format, true, Error.USER_GENERATED)
         end
         injection.assertf = function(format: string)
-        return Error.assertf(format, true, Error.USER_GENERATED)
+            return Error.assertf(format, true, Error.USER_GENERATED)
         end
         return injection
     end
@@ -217,7 +232,7 @@ do
             rawSet = function(oldContext)
                 -- RETURN FUNC
             end;
-            subscribe = function(oldContext)
+            observe = function(oldContext)
                 -- RETURN FUNC
             end;
         })
