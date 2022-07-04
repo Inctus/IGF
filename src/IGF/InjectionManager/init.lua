@@ -108,7 +108,34 @@ do
 
     -- Need to implement Clients Catcher too!!
     function InjectionManager:GetClientsCatcher(context)
-        --TODO()
+        return Catcher.callableEscape(context, {
+            All = function(oldContext)
+                return self:GetDataModuleCatcher(oldContext:clone():addFlag("Clients", self.NetworkManager:GetClients()))
+            end;
+            Some = function(oldContext)
+                return function(predicate)
+                    return self:GetDataModuleCatcher(oldContext:clone():addFlag(
+                        "Clients", 
+                        predicate(self.NetworkManager:GetClients())
+                    ))
+                end
+            end;
+            List = function(oldContext)
+                return function(list)
+                    return self:GetDataModuleCatcher(oldContext:clone():addFlag(
+                        "Clients", 
+                        self.NetworkManager:GetClientsFromIds(list)
+                    ))
+                end
+            end
+        }, function(oldContext)
+            return function(...)
+                return self:GetDataModuleCatcher(oldContext:clone():addFlag(
+                    "Clients", 
+                    self.NetworkManager:GetClientsFromIds(table.pack(...))
+                ))
+            end
+        end)
     end
 
     function InjectionManager:GetDataModuleCatcher(context)
@@ -201,7 +228,9 @@ do
                         if self.IsClient then "Client" else "Server",
                         oldContext.i
                     )
-                    -- ADD A CHECK TO SEE IF ITS ALREADY DECLARED
+                    -- TODO()
+                    -- Can check here to see if this data is already declared once
+                    -- DataManager's API is solidified
                     return function(initialiser)
                         initialiser(self:GetDataDeclarationCatcher(oldContext))
                     end
@@ -215,7 +244,8 @@ do
         return Catcher.escape(context, {
             declare = function(oldContext)
                 return function(entity)
-                    -- INITIALISE DATA ALONG PATH CURRENTLY INDEXED W ENTITY
+                    -- TODO()
+                    -- Initialise along the path with the entity
                 end
             end
         })
