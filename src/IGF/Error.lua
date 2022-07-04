@@ -2,9 +2,11 @@ local Error = {}
 
 Error.FATAL = "[Fatal] "
 Error.NON_FATAL = "[Warning] "
+
 Error.SYNTAX = "Syntax Error: "
 Error.LOGICAL = "Logical Error: "
 Error.INTERNAL = "Internal Error: "
+Error.USER_GENERATED = "User Error: "
 
 function handleAssertion(is_fatal: boolean, format: string, kind: string)
 	return function(assertion, ...)
@@ -30,14 +32,27 @@ function handleError(is_fatal: boolean, format: string, kind: string)
 	end
 end
 
---INFO: Errors in the caller thread with the format string and arguments
+function handlePrint(format: string, kind: string)
+	return function(...)
+		print(kind .. string.format(format, ...))
+	end
+end
+
+--INFO: Prints the formatted string to output nicely
+--PRE:  The format string and arguments are aligned
+--POST: The message is formatted and output
+function Error.printf(format: string, kind: string?)
+	return handlePrint(format, kind or "")
+end
+
+--INFO: Errors in the caller frame with the format string and arguments
 --PRE:  The format string and arguments are aligned
 --POST: Execution halts
 function Error.errorf(format: string, is_fatal: boolean, kind: string?)
 	return handleError(is_fatal, format, kind or "")
 end
 
---INFO: Asserts in the caller thread with the assertion, format string and arguments
+--INFO: Asserts in the caller frame with the assertion, format string and arguments
 --PRE:  The format string and arguments are aligned
 --POST: If the assertion fails, execution halts
 function Error.assertf(format: string, is_fatal: boolean, kind: string?)

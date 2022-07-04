@@ -1,8 +1,11 @@
 local RunService = game:GetService("RunService")
 
+local Types = require(script.Parent.Types)
+local Enums = require(script.Parent.Enums)
+local Error = require(script.Parent.Error)
+
 local Catcher = require(script.Catcher)
 local Context = require(script.Context)
-local Types = require(script.Parent.Types)
 
 local InjectionManager = {}
 InjectionManager.__index = InjectionManager
@@ -31,15 +34,33 @@ function InjectionManager:GetInjector()
     end :: Types.Injection
 end
 
-function InjectionManager:GetServerInjection(context)
+function InjectionManager:GetBaseInjection(instance: Instance)
     local injection = {}
+    injection.Enums = Enums
+    injection.printf = function(format: string, ...: any)
+        Error.printf(format, instance.Name .. " Print: ")(...)
+    end
+    injection.warnf = function(format: string, ...: any)
+        Error.errorf(format, false, Error.USER_GENERATED)(...)
+    end
+    injection.errorf = function(format: string, ...: any)
+        Error.errorf(format, true, Error.USER_GENERATED)(...)
+    end
+    injection.assertf = function(assertion: any, format: string, ...: any)
+        Error.assertf(format, true, Error.USER_GENERATED)(assertion, ...)
+    end
+    return injection
+end
+
+function InjectionManager:GetServerInjection(context)
+    local injection = InjectionManager:GetBaseInjection(context.i)
     injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
     injection.Clients = self:GetClientsCatcher(context)
     return injection
 end
 
 function InjectionManager:GetClientInjection(context)
-    local injection = {}
+    local injection = InjectionManager:GetBaseInjection(context.i)
     injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
     injection.Client = self:GetDataModuleCatcher(context:clone():addFlag("ClientTarget"))
     return injection
