@@ -1,6 +1,7 @@
 --!strict
 
 local Types = require(script.Parent.Types)
+local Error = require(script.Parent.Error)
 
 local Forest = require(script.Forest)
 local Promise = require(script.Parent.Dependencies.Promise)
@@ -11,13 +12,20 @@ ModuleManager.__index = ModuleManager
 
 do
 
-    function ModuleManager.new(IGF): ModuleManager
+    function ModuleManager.new(): ModuleManager
         local self = setmetatable({}, ModuleManager)
 
-        local inject = IGF.InjectionManager:GetInjector()
-        self.Forest = Forest.new(inject) :: Forest
+        self.Forest = nil :: Forest
 
         return self
+    end
+
+    --INFO: Passes the Injection into the ModuleManager
+    --PRE:  The forest isn't initialised
+    --POST: The forest is finally initialised
+    function ModuleManager:GiveInjection(injection: Types.Injection)
+        Error.ModuleManager.InjectedTwice(not self.Forest)
+        self.Forest = Forest.new(injection) :: Forest
     end
 
     --INFO: Adds a new Module to either the Private or Shared forests

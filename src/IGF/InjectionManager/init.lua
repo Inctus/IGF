@@ -10,10 +10,13 @@ local Context = require(script.Context)
 local InjectionManager = {}
 InjectionManager.__index = InjectionManager
 
-function InjectionManager.new(IGF)
+function InjectionManager.new(NetworkManager, ModuleManager, DataManager)
     local self = setmetatable({}, InjectionManager)
 
-    self.IGF = IGF
+    self.NetworkManager = NetworkManager
+    self.ModuleManager = ModuleManager
+    self.DataManager = DataManager
+
     self.IsServer = RunService:IsServer()
     self.IsClient = RunService:IsClient()
 
@@ -37,17 +40,18 @@ end
 function InjectionManager:GetBaseInjection(instance: Instance)
     local injection = {}
     injection.Enums = Enums
-    injection.printf = function(format: string, ...: any)
-        Error.printf(format, instance.Name .. " Print: ")(...)
+    injection.Error = {}
+    injection.printf = function(format: string)
+        return Error.printf(format, instance.Name .. " Print: ")
     end
-    injection.warnf = function(format: string, ...: any)
-        Error.errorf(format, false, Error.USER_GENERATED)(...)
+    injection.warnf = function(format: string)
+        return Error.errorf(format, false, Error.USER_GENERATED)
     end
     injection.errorf = function(format: string, ...: any)
-        Error.errorf(format, true, Error.USER_GENERATED)(...)
+        return Error.errorf(format, true, Error.USER_GENERATED)
     end
-    injection.assertf = function(assertion: any, format: string, ...: any)
-        Error.assertf(format, true, Error.USER_GENERATED)(assertion, ...)
+    injection.assertf = function(format: string)
+       return Error.assertf(format, true, Error.USER_GENERATED)
     end
     return injection
 end
@@ -96,7 +100,7 @@ function InjectionManager:GetModuleAdditionCatcher(context)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
                 return function(...)
-                    self.IGF.ModuleManager:Add(oldContext.Shared, ...)
+                    self.ModuleManager:Add(oldContext.Shared, ...)
                 end
             end;
         }, self:GetFinalModuleCatcher(context)
@@ -109,12 +113,12 @@ function InjectionManager:GetFinalModuleCatcher(context)
                 assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
                     "Attempt to add Modules illegaly, across the client-server boundary.")
                 return function()
-                    self.IGF.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path), oldContext.Shared)
+                    self.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path), oldContext.Shared)
                 end
             end;
         },
         function(...)
-            self.IGF.ModuleManager:Run(context.i, table.clone(context.path), context.Shared, ...)
+            self.ModuleManager:Run(context.i, table.clone(context.path), context.Shared, ...)
         end
     )
 end

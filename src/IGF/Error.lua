@@ -96,4 +96,8 @@ Error.Forest.RetrievalFailure = Error.assertf("Unknown issue with retrieving alo
 Error.Enums = {}
 Error.Enums.AttemptedWrite = Error.errorf("Attempt to overwrite Enum '%s.%s' with Value '%s'", true, Error.LOGICAL)
 
+-- ModuleManager Errors
+Error.ModuleManager = {}
+Error.ModuleManager.InjectedTwice = Error.assertf("Attempt to reinitialise Forest", true, Error.INTERNAL)
+
 return Error
