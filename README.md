@@ -12,11 +12,12 @@ This project will be completed by August 2022.
 - Simplify ModuleManager
   - ~~Convert forest into a HashMap<Instance, MetaData>~~
   - ~~Wire Forest into ModuleManager~~
-  - Add Init handling to Node, to grab type of Node successfully and use it in Loading
-  - Add Run method to Node
-  - Annotate ModuleManager
+  - ~~Add Run method to Node~~
+  - ~~Annotate ModuleManager~~
 - InjectionManager Additions
   - Create Clients catcher for the Server
+  - Create ModuleContentCatcher
+  - Add Init handling to when injecting, to return the proxy and content catcher
   - Use Error module for assertions
   - Add a Require Module Catcher to catch module requiring, to allow for hidden injection into function calls of Modules and Classes alike
   - Wire network calls into NetworkManager from both Data and Module catchers
