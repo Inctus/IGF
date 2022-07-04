@@ -100,4 +100,22 @@ Error.Enums.AttemptedWrite = Error.errorf("Attempt to overwrite Enum '%s.%s' wit
 Error.ModuleManager = {}
 Error.ModuleManager.InjectedTwice = Error.assertf("Attempt to reinitialise Forest", true, Error.INTERNAL)
 
+--InjectionManager Errors
+Error.InjectionManager = {}
+Error.InjectionManager.AddFromServerToclient = Error.assertf("Attempt to add Module from Server Source '%s' along path 'Client -> %s'", true, Error.LOGICAL)
+Error.InjectionManager.AddFromClientToServer = Error.assertf("Attempt to add Module from Client Source '%s' along path 'Server -> %s'", true, Error.LOGICAL)
+Error.InjectionManager.RequireFromServerToclient = Error.assertf("Attempt to require Module from Server Source '%s' along path 'Client -> %s'",
+	true,
+	Error.LOGICAL
+)
+Error.InjectionManager.RequireFromClientToServer = Error.assertf("Attempt to require Module from Client Source '%s' along path 'Server -> %s'",
+	true,
+	Error.LOGICAL
+)
+Error.InjectionManager.RunFromServerToclient = Error.assertf("Attempt to run Module from Server Source '%s' along path 'Client -> %s'", true, Error.LOGICAL)
+Error.InjectionManager.RunFromClientToServer = Error.assertf("Attempt to run Module from Client Source '%s' along path 'Server -> %s'", true, Error.LOGICAL)
+Error.InjectionManager.PrivateDataServerToClient = Error.assertf("Attempt to access Private Client data from Server Source '%s'", true, Error.LOGICAL)
+Error.InjectionManager.PrivateDataClientToServer = Error.assertf("Attempt to access Private Client data from Server Source '%s'", true, Error.LOGICAL)
+Error.InjectionManager.IllegalDefinition = Error.asserf("Illegaly defining %s.%s from %s Source '%s'", true, Error.LOGICAL)
+
 return Error

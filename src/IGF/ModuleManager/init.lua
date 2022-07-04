@@ -24,7 +24,7 @@ do
     --PRE:  The forest isn't initialised
     --POST: The forest is finally initialised
     function ModuleManager:GiveInjection(injection: Types.Injection)
-        Error.ModuleManager.InjectedTwice(not self.Forest)
+        Error.ModuleManager.InjectedTwice(self.Forest)
         self.Forest = Forest.new(injection) :: Forest
     end
 

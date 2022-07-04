@@ -17,7 +17,7 @@ end
 
 function clone(context)
     local _n = {}
-    for k, v in pairs(context) do
+    for k, v in context do
         _n[k] = v
     end
     return _n

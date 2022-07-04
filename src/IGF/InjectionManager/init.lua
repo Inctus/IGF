@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local Types = require(script.Parent.Types)
 local Enums = require(script.Parent.Enums)
 local Error = require(script.Parent.Error)
+local Utility = require(script.Parent.Utility)
 
 local Catcher = require(script.Catcher)
 local Context = require(script.Context)
@@ -78,7 +79,7 @@ do
     function InjectionManager:GetServerInjection(context)
         local injection = InjectionManager:GetBaseInjection(context.i)
         injection.Server = self:GetDataModuleCatcher(context:clone():addFlag("ServerTarget"))
-        injection.Clients = self:GetClientsCatcher(context)
+        injection.Clients = self:GetClientsCatcher(context:clone():addFlag("ClientTarget"))
         return injection
     end
 
@@ -120,8 +121,10 @@ do
     function InjectionManager:GetModuleAdditionCatcher(context)
         return Catcher.strictIndexableEscape(context, {
                 add = function(oldContext)
-                    assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
-                        "Attempt to add Modules illegaly, across the client-server boundary.")
+                    if not (self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget) then
+                        Error.InjectionManager.AddFromServerToclient(self.IsServer and oldContext.ServerTarget, context.i, Utility.prettifyPath(context.path))
+                        Error.InjectionManager.AddFromClientToServer(self.IsClient and oldContext.ClientTarget, context.i, Utility.prettifyPath(context.path))
+                    end
                     return function(...)
                         self.ModuleManager:Add(oldContext.Shared, ...)
                     end
@@ -133,14 +136,23 @@ do
     function InjectionManager:GetFinalModuleCatcher(context)
         return Catcher.callableEscape(context, {
                 require = function(oldContext)
-                    assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
-                        "Attempt to add Modules illegaly, across the client-server boundary.")
+                    if not (self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget) then
+                        Error.InjectionManager.RequireFromServerToclient(self.IsServer and oldContext.ServerTarget, context.i, Utility.prettifyPath(context.path))
+                        Error.InjectionManager.RequireFromClientToServer(self.IsClient and oldContext.ClientTarget, context.i, Utility.prettifyPath(context.path))
+                    end
                     return function()
                         self.ModuleManager:Retrieve(oldContext.i, table.clone(oldContext.path), oldContext.Shared)
                     end
                 end;
             },
+            -- TODO()
+            -- Possibly change this to allow Modules to be ran across the client-server boundary
+            -- Requires significant refactoring
             function(...)
+                if not (self.IsServer and context.ServerTarget or self.IsClient and context.ClientTarget) then
+                    Error.InjectionManager.RunFromServerToClient(self.IsServer and context.ServerTarget, context.i, Utility.prettifyPath(context.path))
+                    Error.InjectionManager.RunFromClientToServer(self.IsClient and context.ClientTarget, context.i, Utility.prettifyPath(context.path))
+                end
                 self.ModuleManager:Run(context.i, table.clone(context.path), context.Shared, ...)
             end
         )
@@ -152,8 +164,10 @@ do
                     return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Public"))
                 end;
                 Private = function(oldContext)
-                    assert(self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget,
-                        "Attempt to access private Data illegally, across the client-server boundary.")
+                    if not (self.IsServer and oldContext.ServerTarget or self.IsClient and oldContext.ClientTarget) then
+                        Error.InjectionManager.PrivateDataServerToClient(self.IsServer and context.ServerTarget, context.i)
+                        Error.InjectionManager.PrivateDataClientToServer(self.IsClient and context.ClientTarget, context.i)
+                    end
                     return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Private"))
                 end;
             }
@@ -163,15 +177,14 @@ do
     function InjectionManager:GetDataInitialisationCatcher(context)
         return Catcher.strictIndexableEscape(context, {
                 initialise = function(oldContext)
-                    assert(oldContext.ServerTarget and (oldContext.Public or oldContext.Private) and self.IsServer
+                    local valid = oldContext.ServerTarget and (oldContext.Public or oldContext.Private) and self.IsServer
                         or oldContext.ClientTarget and oldContext.Public and self.IsServer
-                        or oldContext.ClientTarget and oldContext.Private and self.IsClient,
-                        string.format(
-                            "Attempt to define %s%s illegally from %s",
-                            if oldContext.ClientTarget then "Client." else "Server",
-                            if oldContext.Public then "Public" else "Private",
-                            if self.IsClient then "Client" else "Server"
-                        )
+                        or oldContext.ClientTarget and oldContext.Private and self.IsClient
+                    Error.InjectionManager.IllegalDefinition(valid,
+                        if oldContext.ClientTarget then "Client" else "Server",
+                        if oldContext.Public then "Public" else "Private",
+                        if self.IsClient then "Client" else "Server",
+                        oldContext.i
                     )
                     -- ADD A CHECK TO SEE IF ITS ALREADY DECLARED
                     return function(initialiser)
