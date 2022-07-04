@@ -14,7 +14,7 @@ This project will be completed by August 2022.
   - ~~Wire Forest into ModuleManager~~
   - ~~Add Run method to Node~~
   - ~~Annotate ModuleManager~~
-- Create Enums
+- ~~Create Enums~~
 - InjectionManager Additions
   - Create Clients catcher for the Server
   - Create ModuleContentCatcher
