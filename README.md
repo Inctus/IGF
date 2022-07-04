@@ -21,8 +21,8 @@ This project will be completed by August 2022.
   - Add Init handling to when injecting, to return the proxy and content catcher
   - Use Error module for assertions
   - Wire network calls into NetworkManager from both Data and Module catchers
-  - Inject Enums into the Proxy directly as a reference to the Enums table
-  - Add printf, assertf and errorf as functions to the proxy.
+  - ~~Inject Enums into the Proxy directly as a reference to the Enums table~~
+  - ~~Add printf, assertf and errorf as functions to the proxy.~~
 - DataManager
   - Implement Observable State Tree
   - Create Subscription with statically generated GUID + timestamp
