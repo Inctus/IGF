@@ -77,4 +77,8 @@ Error.Forest.GlobalUnknownTargetRetrieval = Error.assertf(
 )
 Error.Forest.RetrievalFailure = Error.assertf("Unknown issue with retrieving along '%s' from '%s'", true, Error.INTERNAL)
 
+-- Enum Errors
+Error.Enums = {}
+Error.Enums.AttemptedWrite = Error.errorf("Attempt to overwrite Enum '%s.%s' with Value '%s'", true, Error.LOGICAL)
+
 return Error
