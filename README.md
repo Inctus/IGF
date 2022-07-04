@@ -8,8 +8,8 @@ This project will be completed by August 2022.
 
 # To-Do:
 
-- Fix Utility names in code
-- Simplify ModuleManager
+- ~~Fix Utility names in code~~
+- ~~Simplify ModuleManager~~
   - ~~Convert forest into a HashMap<Instance, MetaData>~~
   - ~~Wire Forest into ModuleManager~~
   - ~~Add Run method to Node~~
