@@ -15,7 +15,10 @@ do
         Error.Node.EmptyInsert(instance, is_shared and "shared" or "")
         local self = setmetatable({}, Node)
 
+        self.LoadedModule = false :: boolean
         self.Content = nil :: any?
+        self.Proxy = nil :: any?
+
         self.Eager = eager :: boolean
         self.I = instance :: Instance
         self.Loaded = false :: boolean
@@ -25,12 +28,15 @@ do
     end
 
     --INFO: Loads a Node non-recursively
-    --PRE:  The Node isn'Types loaded
+    --PRE:  The Node isn't loaded
     --POST: If the Node contains a modulescript it is loaded
     function Node:LazyLoad(inject: Types.Injection)
         if not self.Loaded and self.I:IsA("ModuleScript") then
-            self.Content = require(self.I :: ModuleScript) :: any?
-            inject(self.I, self.Content)
+            local content = require(self.I :: ModuleScript) :: any?
+            if type(content) == "table" then
+                self.Proxy, self.Content = inject(self.I, content)
+                self.LoadedModule = true
+            end
         end
 
         self.Loaded = true
@@ -74,7 +80,8 @@ do
     --PRE:  The Node is a ModuleScript with a Main
     --POST: The Node is ran
     function Node:Run(...)
-        --TODO()
+        Error.Node.NonModuleRun(self.LoadedModule, self.I.Name)
+        self.Content.main(self.Proxy, ...)
     end
 
     --INFO: Verifies whether a given ancestor is a ancestor of the current Node

@@ -2,7 +2,7 @@ local RunService = game:GetService("RunService")
 
 local Catcher = require(script.Catcher)
 local Context = require(script.Context)
-local t = require(script.Parent.Types)
+local Types = require(script.Parent.Types)
 
 local InjectionManager = {}
 InjectionManager.__index = InjectionManager
@@ -18,12 +18,17 @@ function InjectionManager.new(IGF)
 end
 
 function InjectionManager:GetInjector()
-    return function(instance: Instance)
+    return function(instance: Instance, module_content: table, module_proxy: table)
         local initialContext = Context.fromModule(instance)
+        --TODO() Modify this to return a ModuleCatcher
+        --RUN THE INIT HERE
+        --CAPTURE THE ENUM AND BLACKLIST/WHITELIST
+        --CONSTRUCT CATCHER WITH ALL THIS INFO
+        --FINALLY CALL STATIC METHOD WITH THE PROXY GIVEN
         return if self.IsServer
             then self:GetServerInjection(initialContext)
             else self:GetClientInjection(initialContext)
-    end
+    end :: Types.Injection
 end
 
 function InjectionManager:GetServerInjection(context)
@@ -88,7 +93,7 @@ function InjectionManager:GetFinalModuleCatcher(context)
             end;
         },
         function(...)
-            self.IGF.ModuleManager:Run(context.i, table.clone(context.path), oldContext.Shared, ...)
+            self.IGF.ModuleManager:Run(context.i, table.clone(context.path), context.Shared, ...)
         end
     )
 end

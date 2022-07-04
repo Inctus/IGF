@@ -48,6 +48,7 @@ end
 Error.Node = {}
 -- Node Creation
 Error.Node.EmptyInsert = Error.assertf("Attempt to construct empty %s Node", true, Error.LOGICAL)
+Error.Node.NonModuleRun = Error.assertf("Attempt to run non-table ModuleScript '%s'", true, Error.LOGICAL)
 
 -- Forest Errors
 Error.Forest = {}
