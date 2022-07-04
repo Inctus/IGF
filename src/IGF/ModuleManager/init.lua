@@ -1,10 +1,8 @@
 --!strict
 
-local t = require(script.Parent.Types)
-local c = require(script.Parent.Dependencies.c)
+local Types = require(script.Parent.Types)
 
 local Forest = require(script.Forest)
-local Node = require(script.Forest.Node)
 local Promise = require(script.Parent.Dependencies.Promise)
 
 --INFO: Handles all Module interactions
@@ -22,19 +20,19 @@ do
         return self
     end
 
-    function ModuleManager:Add(is_shared: boolean, instance: Instance, eager_array: t.Array<ModuleScript>): Promise
+    function ModuleManager:Add(is_shared: boolean, instance: Instance, eager_array: Types.Array<ModuleScript>): Promise
         return Promise.try(function()
             self.Forest:AddTree(instance, eager_array, is_shared)
         end)
     end
 
-    function ModuleManager:Retrieve(from: ModuleScript, path: t.Array<string>, target_shared: boolean): Promise
+    function ModuleManager:Retrieve(from: ModuleScript, path: Types.Array<string>, target_shared: boolean): Promise
         return Promise.try(function()
             self.Forest:Retrieve(from, path, target_shared):GetContent()
         end)
     end
 
-    function ModuleManager:Run(from: ModuleScript, path: t.Array<string>, target_shared: boolean, ...): Promise
+    function ModuleManager:Run(from: ModuleScript, path: Types.Array<string>, target_shared: boolean, ...): Promise
         local args = {...}
         return Promise.try(function()
             if #args > 0 then

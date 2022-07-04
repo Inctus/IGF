@@ -1,7 +1,7 @@
 --!strict
 
-local t = require(script.Parent.Parent.Parent.Types)
-local e = require(script.Parent.Parent.Parent.Error)
+local Types = require(script.Parent.Parent.Parent.Types)
+local Error = require(script.Parent.Parent.Parent.Error)
 
 --INFO: Node class encapsulates an Instance for use within the Forest
 local Node = {}
@@ -12,7 +12,7 @@ do
     --PRE:  The Instance is non-null
     --POST: The Instance is wrapped in a Node containing all important metadata.
     function Node.new(instance: Instance, eager: boolean, is_shared: boolean): Node
-        e.Node.EmptyInsert(instance, is_shared and "shared" or "")
+        Error.Node.EmptyInsert(instance, is_shared and "shared" or "")
         local self = setmetatable({}, Node)
 
         self.Content = nil :: any?
@@ -25,9 +25,9 @@ do
     end
 
     --INFO: Loads a Node non-recursively
-    --PRE:  The Node isn't loaded
+    --PRE:  The Node isn'Types loaded
     --POST: If the Node contains a modulescript it is loaded
-    function Node:LazyLoad(inject: t.Injection)
+    function Node:LazyLoad(inject: Types.Injection)
         if not self.Loaded and self.I:IsA("ModuleScript") then
             self.Content = require(self.I :: ModuleScript) :: any?
             inject(self.I, self.Content)
@@ -37,9 +37,9 @@ do
     end
 
     --INFO: Loads a node recursively
-    --PRE:  The Node isn't already loaded
+    --PRE:  The Node isn'Types already loaded
     --POST: Recursively loads all sub-nodes then this node
-    function Node:EagerLoad(inject: t.Injection, forest: t.HashMap<Instance, Node>)
+    function Node:EagerLoad(inject: Types.Injection, forest: Types.HashMap<Instance, Node>)
         for _, sub_child in self.I:GetChildren() do
             local sub_node = forest[sub_child]
             sub_node:EagerLoad(inject)
@@ -49,9 +49,9 @@ do
     end
 
     --INFO: Loads a node
-    --PRE: The node isn't loaded
+    --PRE: The node isn'Types loaded
     --POST: The node is loaded based off of its Lazy flag
-    function Node:Load(inject: t.Injection, forest: t.HashMap<Instance, Node>)
+    function Node:Load(inject: Types.Injection, forest: Types.HashMap<Instance, Node>)
         if self.Eager then
             self:EagerLoad(inject, forest)
         else
@@ -62,7 +62,7 @@ do
     --INFO: Gets the contents of the node
     --PRE:  Injection injects the relevant information for Loading
     --POST: The content of the load is returned
-    function Node:GetContent(inject: t.Injection, forest: t.HashMap<Instance, Node>)
+    function Node:GetContent(inject: Types.Injection, forest: Types.HashMap<Instance, Node>)
         if not self.Loaded then
             self:Load(inject, forest)
         end
