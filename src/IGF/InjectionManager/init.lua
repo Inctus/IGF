@@ -106,7 +106,7 @@ do
         return injection
     end
 
-    -- Need to implement Clients Catcher too!!
+    --INFO: Is the Catcher provided for the Server when they index into Clients
     function InjectionManager:GetClientsCatcher(context)
         return Catcher.callableEscape(context, {
             All = function(oldContext)
@@ -128,6 +128,7 @@ do
                     ))
                 end
             end
+        -- Here we have the function which is ran when we call Clients
         }, function(oldContext)
             return function(...)
                 return self:GetDataModuleCatcher(oldContext:clone():addFlag(
@@ -138,6 +139,7 @@ do
         end)
     end
 
+    --INFO: Gets the Data/Module Catcher. Index has to be Data/Modules
     function InjectionManager:GetDataModuleCatcher(context)
         return Catcher.strictEscape(context, {
             Data = function(oldContext)
@@ -149,17 +151,22 @@ do
         })
     end
 
+    --INFO: Gets the Shared catcher, Index can be either Shared or optionally Private!
     function InjectionManager:GetModuleSharedCatcher(context)
         return Catcher.strictIndexableEscape(
             context, {
                 Shared = function(oldContext)
                     return self:GetModuleAdditionCatcher(oldContext:clone():addFlag("Shared"))
                 end;
+                Private = function(oldContext)
+                    return self:GetModuleAdditionCatcher(context)
+                end
             },
             self:GetModuleAdditionCatcher(context)
         )
     end
 
+    --INFO: Gets the Catcher that allows you to add modules and exit index, or continue indexing the Module hierarchy.
     function InjectionManager:GetModuleAdditionCatcher(context)
         return Catcher.strictIndexableEscape(context, {
                 add = function(oldContext)
@@ -175,6 +182,7 @@ do
         )
     end
 
+    --INFO: Allows you to index into the Module hierarchy and require or run modules
     function InjectionManager:GetFinalModuleCatcher(context)
         return Catcher.callableEscape(context, {
                 require = function(oldContext)
@@ -200,8 +208,9 @@ do
         )
     end
 
+    --INFO: Allows you to choose between Public or Private data, defaults to Public
     function InjectionManager:GetDataPublicPrivateCatcher(context)
-        return Catcher.strictEscape(context, {
+        return Catcher.strictIndexableEscape(context, {
                 Public = function(oldContext)
                     return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Public"))
                 end;
@@ -212,10 +221,12 @@ do
                     end
                     return self:GetDataInitialisationCatcher(oldContext:clone():addFlag("Private"))
                 end;
-            }
+            },
+            self:GetDataInitialisationCatcher(context:clone():addFlag("Public"))
         )
     end
 
+    --INFO: Allows you to initialise data
     function InjectionManager:GetDataInitialisationCatcher(context)
         return Catcher.strictIndexableEscape(context, {
                 initialise = function(oldContext)
@@ -240,6 +251,7 @@ do
         )
     end
 
+    --INFO: Allows you to declare an entity at a depth within a initialisation of data
     function InjectionManager:GetDataDeclarationCatcher(context)
         return Catcher.escape(context, {
             declare = function(oldContext)
@@ -251,6 +263,7 @@ do
         })
     end
 
+    --INFO: Allows you to interact with Data
     function InjectionManager:GetFinalDataCatcher(context)
         return Catcher.escape(context, {
             get = function(oldContext)

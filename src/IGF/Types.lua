@@ -1,11 +1,4 @@
 -- !strict
---[[    Types.lua | Copyright Notice
-
-        IGF.lua | Full Copyright Notice
-
-        MIT License
-
-        Copyright (c) 2022 Haashim-Ali Hussain      ]]--
 
 export type Array<T> = { [number]: T }
 
