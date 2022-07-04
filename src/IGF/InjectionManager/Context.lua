@@ -28,6 +28,7 @@ function addFlag(context, index, value)
     return context
 end
 
+--INFO: A Immutable Context used to control flow into the Catchers
 local Context = {}
 
 function Context.fromModule(instance: Instance)
