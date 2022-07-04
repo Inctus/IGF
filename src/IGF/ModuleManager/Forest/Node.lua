@@ -8,6 +8,7 @@ local Node = {}
 Node.__index = Node
 
 do
+
     --INFO: Wraps a new Node
     --PRE:  The Instance is non-null
     --POST: The Instance is wrapped in a Node containing all important metadata.
