@@ -16,7 +16,7 @@ This project will be completed by August 2022.
   - ~~Annotate ModuleManager~~
 - ~~Create Enums~~
 - InjectionManager Additions
-  - Create Clients catcher for the Server
+  - ~~Create Clients catcher for the Server~~
   - ~~Create tableWrapperCatcher~~
   - ~~Add Init handling to when injecting, to return the proxy and content catcher~~
   - ~~Use Error module for assertions~~
