@@ -14,7 +14,6 @@ do
 
     function ModuleManager.new(): ModuleManager
         local self = setmetatable({}, ModuleManager)
-
         self.Forest = nil :: Forest
 
         return self
